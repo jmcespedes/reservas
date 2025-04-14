@@ -1,16 +1,30 @@
-import pyodbc
+from flask import Flask, request
 from datetime import datetime, timedelta
+import pyodbc
 import pytz
-import requests
 import urllib.parse
+from twilio.twiml.messaging_response import MessagingResponse
 
-# Datos de Twilio
+
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "Servidor Flask funcionando correctamente 🎉"
+
+# Solo para pruebas locales
+if __name__ == '__main__':
+    app.run(debug=True)
+
+# Estado de usuarios temporal (se recomienda Redis o DB real para producción)
+user_state = {}
+
+# Twilio config
 account_sid = 'ACca96871739ae16b72c725adec77012c8'
 auth_token = 'd588793b92fd6e40c94691a9a37ec2a5'
 twilio_whatsapp_number = 'whatsapp:+14155238886'
-your_phone = 'whatsapp:+56942675794'
 
-# Config DB
+# DB config
 db_config = {
     'driver': '{ODBC Driver 17 for SQL Server}',
     'server': '168.88.162.158',
@@ -19,6 +33,7 @@ db_config = {
     'pwd': 'cli_abas'
 }
 
+# Obtener horas disponibles
 def get_available_slots():
     try:
         tz = pytz.timezone('America/Santiago')
@@ -37,41 +52,14 @@ def get_available_slots():
 
         cursor.execute(query, (today,))
         rows = cursor.fetchall()
-
         cursor.close()
         conn.close()
-
-        return rows if rows else []
-
+        return rows
     except Exception as e:
-        print(f"Error al consultar SQL Server: {e}")
+        print("Error DB:", e)
         return []
 
-def send_whatsapp_options(to, opciones):
-    body = "📅 *Selecciona una hora para reservar:*\n\n"
-    for i, row in enumerate(opciones, 1):
-        hora = row[1].strftime('%H:%M')
-        medico = row[2]
-        body += f"{i}. {hora} - {medico}\n"
-
-    body += "\nResponde con el número de la opción que deseas ✅"
-
-    data = {
-        'To': to,
-        'From': twilio_whatsapp_number,
-        'Body': body
-    }
-
-    url = f"https://api.twilio.com/2010-04-01/Accounts/{account_sid}/Messages.json"
-
-    response = requests.post(
-        url,
-        auth=(account_sid, auth_token),
-        data=data
-    )
-
-    print(f"📤 Respuesta Twilio (opciones): {response.status_code} - {response.text}")
-
+# Generar link calendario
 def generar_google_calendar_link(fecha, hora, medico, especialidad):
     tz = pytz.timezone('America/Santiago')
     dt_inicio = tz.localize(datetime.combine(fecha, hora))
@@ -88,49 +76,64 @@ def generar_google_calendar_link(fecha, hora, medico, especialidad):
         'location': 'Clínica Central',
     }
 
-    url = 'https://www.google.com/calendar/render?' + urllib.parse.urlencode(params)
-    return url
+    return 'https://www.google.com/calendar/render?' + urllib.parse.urlencode(params)
 
-def send_calendar_link(to, slot):
-    fecha = slot[0]
-    hora = slot[1]
-    medico = slot[2]
-    especialidad = slot[3]
+# Webhook de WhatsApp
+@app.route("/whatsapp", methods=['POST'])
+def whatsapp_reply():
+    from_number = request.form.get('From')
+    user_msg = request.form.get('Body').strip().lower()
+    response = MessagingResponse()
+    msg = response.message()
 
-    link = generar_google_calendar_link(fecha, hora, medico, especialidad)
+    estado = user_state.get(from_number, {}).get("estado", "inicio")
 
-    body = f"✅ Tu cita médica con *{medico}* ha sido agendada.\n🩺 Especialidad: {especialidad}\n📅 Fecha: {fecha.strftime('%Y-%m-%d')} a las {hora.strftime('%H:%M')}\n\n📲 Agrega la cita a tu calendario:\n{link}"
+    # 🟢 Etapa 1: Inicio
+    if estado == "inicio":
+        if "agendar" in user_msg:
+            slots = get_available_slots()
+            if slots:
+                texto = "📅 *Opciones de cita disponibles:*\n\n"
+                for i, row in enumerate(slots, 1):
+                    texto += f"{i}. {row[1].strftime('%H:%M')} - {row[2]}\n"
+                texto += "\nEscribe el *número* de la opción que deseas reservar ✅"
 
-    data = {
-        'To': to,
-        'From': twilio_whatsapp_number,
-        'Body': body
-    }
+                # Guardamos el estado y las opciones
+                user_state[from_number] = {"estado": "esperando_opcion", "slots": slots}
+                msg.body(texto)
+            else:
+                msg.body("⛔ No hay horas disponibles por ahora. Intenta más tarde.")
+        else:
+            msg.body("👋 Hola, escribe *'Quiero agendar una hora'* para ver las citas disponibles.")
+    
+    # 🟡 Etapa 2: Esperando número
+    elif estado == "esperando_opcion":
+        if user_msg.isdigit():
+            seleccion = int(user_msg) - 1
+            slots = user_state[from_number]["slots"]
 
-    url = f"https://api.twilio.com/2010-04-01/Accounts/{account_sid}/Messages.json"
+            if 0 <= seleccion < len(slots):
+                slot = slots[seleccion]
+                link = generar_google_calendar_link(slot[0], slot[1], slot[2], slot[3])
 
-    response = requests.post(
-        url,
-        auth=(account_sid, auth_token),
-        data=data
-    )
+                msg.body(
+                    f"✅ Cita con *{slot[2]}* agendada para el {slot[0].strftime('%Y-%m-%d')} a las {slot[1].strftime('%H:%M')}.\n\n"
+                    f"📲 Agrega al calendario aquí:\n{link}"
+                )
 
-    print(f"📤 Respuesta Twilio (calendar link): {response.status_code} - {response.text}")
+                user_state[from_number]["estado"] = "confirmado"
+            else:
+                msg.body("❌ Opción no válida. Por favor escribe un número del 1 al 3.")
+        else:
+            msg.body("❌ Por favor responde solo con el número de la opción (1, 2 o 3).")
+    
+    # 🔵 Etapa 3: Confirmado
+    elif estado == "confirmado":
+        msg.body("🎉 Ya has agendado tu cita. Si deseas otra, escribe *'agendar'*.")
 
-# --- MAIN ---
+    return str(response)
 
-if __name__ == '__main__':
-    print("🔎 Obteniendo horas médicas disponibles...")
+# Para correr local: flask run --port 5000
+if __name__ == "__main__":
+    app.run(port=5000)
 
-    slots = get_available_slots()
-
-    if slots:
-        print(f"📨 Enviando opciones a {your_phone}...")
-        send_whatsapp_options(your_phone, slots)
-
-        # 🔁 Simulamos que el usuario eligió la primera opción (índice 0)
-        seleccion = 0
-        print("🗓️ Enviando enlace de calendario para la opción seleccionada...")
-        send_calendar_link(your_phone, slots[seleccion])
-    else:
-        print("⛔ No hay horas disponibles para hoy.")
