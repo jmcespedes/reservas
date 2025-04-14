@@ -3,6 +3,14 @@ from datetime import datetime, timedelta
 import pytz
 import requests
 import urllib.parse
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route("/")
+def inicio():
+    return "¡Hola desde Flask en Render!"
+
 
 # Datos de Twilio
 account_sid = 'ACca96871739ae16b72c725adec77012c8'
