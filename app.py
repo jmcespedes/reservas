@@ -42,7 +42,7 @@ twilio_whatsapp_number = 'whatsapp:+14155238886'
 # DB config
 db_config = {
     'driver': '{ODBC Driver 17 for SQL Server}',
-    'server': '168.88.162.66',
+    'server': '168.88.162.158',
     'database': 'DB_INFORMATICA',
     'uid': 'cli_abas',
     'pwd': 'cli_abas'
