@@ -6,6 +6,25 @@ import urllib.parse
 
 from twilio.twiml.messaging_response import MessagingResponse
 
+import os
+
+def test_ping(ip):
+    response = os.system(f"ping -c 4 {ip}")  # En Linux, usamos '-c 4' para enviar 4 paquetes
+    if response == 0:
+        return "¡Conexión exitosa!"
+    else:
+        return "No se puede hacer ping al servidor."
+
+# Prueba la conexión con la IP
+result = test_ping("168.88.162.66")
+print(result)
+
+
+
+
+
+
+
 app = Flask(__name__)
 
 @app.route("/")
