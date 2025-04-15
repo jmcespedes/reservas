@@ -4,7 +4,6 @@ import pytz
 import urllib.parse
 import json
 from pathlib import Path
-
 from twilio.twiml.messaging_response import MessagingResponse
 
 
