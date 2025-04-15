@@ -104,6 +104,7 @@ def whatsapp_reply():
     msg = response.message()
 
     estado = user_state.get(from_number, {}).get("estado", "inicio")
+    print(f"Estado actual para {from_number}: {estado}")  # Depuración
 
     if estado == "inicio":
         if "agendar" in user_msg or "hora" in user_msg or "cita" in user_msg:
@@ -122,6 +123,7 @@ def whatsapp_reply():
             msg.body(respuesta)
 
     elif estado == "esperando_opcion":
+        print(f"Usuario seleccionó opción: {user_msg}")  # Depuración
         if user_msg.isdigit():
             seleccion = int(user_msg) - 1
             slots = user_state[from_number]["slots"]
