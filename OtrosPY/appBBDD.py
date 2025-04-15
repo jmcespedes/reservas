@@ -1,27 +1,47 @@
 from flask import Flask, request
 from datetime import datetime, timedelta
+import pyodbc
 import pytz
 import urllib.parse
-import json
-from pathlib import Path
 
 from twilio.twiml.messaging_response import MessagingResponse
 
+import os
+
+def test_ping(ip):
+    response = os.system(f"ping -c 4 {ip}")  # En Linux, usamos '-c 4' para enviar 4 paquetes
+    if response == 0:
+        return "¡Conexión exitosa!"
+    else:
+        return "No se puede hacer ping al servidor."
+
+result = test_ping("168.88.162.158")
+print(result)
+
+
 
 app = Flask(__name__)
-
-
-DATA_DIR = Path(__file__).parent / 'data'
 
 @app.route("/")
 def home():
     return "Servidor Flask funcionando correctamente 🎉"
 
+
 user_state = {}
+
 
 account_sid = 'ACca96871739ae16b72c725adec77012c8'
 auth_token = 'd588793b92fd6e40c94691a9a37ec2a5'
 twilio_whatsapp_number = 'whatsapp:+14155238886'
+
+
+db_config = {
+    'driver': '{ODBC Driver 17 for SQL Server}',
+    'server': '168.88.162.158',
+    'database': 'DB_INFORMATICA',
+    'uid': 'cli_abas',
+    'pwd': 'cli_abas'
+}
 
 def get_available_slots():
     try:
@@ -29,32 +49,31 @@ def get_available_slots():
         today = datetime.now(tz).strftime('%Y-%m-%d')
         print("Buscando horas para:", today)
 
-        with open(DATA_DIR / 'citas.json', 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            
+        conn_str = f"DRIVER={db_config['driver']};SERVER={db_config['server']};DATABASE={db_config['database']};UID={db_config['uid']};PWD={db_config['pwd']}"
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
 
-        citas_hoy = [
-            c for c in data['citas'] 
-            if c['fecha'] == today and c['disponible'] == 1
-        ]
-        
+        query = """
+        SELECT TOP 3 fecha, hora, medico, especialidad
+        FROM Reservas
+        WHERE CONVERT(DATE, fecha) = ? AND disponible = 1
+        ORDER BY hora
+        """
+        cursor.execute(query, (today,))
+        rows = cursor.fetchall()
 
-        citas_hoy.sort(key=lambda x: x['hora'])
-        return [
-            (c['fecha'], datetime.strptime(c['hora'], '%H:%M:%S').time(), c['medico'], c['especialidad'])
-            for c in citas_hoy[:3]
-        ]
-        
+        print("🔍 Cantidad:", rows)
+
+        cursor.close()
+        conn.close()
+        return rows
     except Exception as e:
-        print("Error leyendo citas:", e)
+        print("Error:", e)
         return []
 
 def generar_google_calendar_link(fecha, hora, medico, especialidad):
     tz = pytz.timezone('America/Santiago')
-    dt_inicio = tz.localize(datetime.combine(
-        datetime.strptime(fecha, '%Y-%m-%d').date(),
-        hora
-    ))
+    dt_inicio = tz.localize(datetime.combine(fecha, hora))
     dt_fin = dt_inicio + timedelta(minutes=30)
 
     start_str = dt_inicio.strftime('%Y%m%dT%H%M%S')
@@ -72,17 +91,27 @@ def generar_google_calendar_link(fecha, hora, medico, especialidad):
 
 def buscar_respuesta_faq(user_input):
     try:
-        with open(DATA_DIR / 'faqs.json', 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            
-        user_input = user_input.lower()
-        for faq in data['faqs']:
-            if user_input in faq['pregunta'].lower():
-                return faq['respuesta']
-        return None
-        
+        conn_str = f"DRIVER={db_config['driver']};SERVER={db_config['server']};DATABASE={db_config['database']};UID={db_config['uid']};PWD={db_config['pwd']}"
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
+
+        query = """
+        SELECT TOP 1 respuesta
+        FROM faq_hospital_dipreca
+        WHERE LOWER(pregunta) LIKE LOWER(?)
+        """
+        cursor.execute(query, (f"%{user_input}%",))
+        row = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        if row:
+            return row[0]
+        else:
+            return None
     except Exception as e:
-        print("Error leyendo FAQs:", e)
+        print("Error al buscar en FAQ:", e)
         return None
 
 @app.route("/whatsapp", methods=['POST'])
@@ -123,7 +152,7 @@ def whatsapp_reply():
                 link = generar_google_calendar_link(slot[0], slot[1], slot[2], slot[3])
 
                 msg.body(
-                    f"✅ Cita con *{slot[2]}* agendada para el {slot[0]} a las {slot[1].strftime('%H:%M')}.\n\n"
+                    f"✅ Cita con *{slot[2]}* agendada para el {slot[0].strftime('%Y-%m-%d')} a las {slot[1].strftime('%H:%M')}.\n\n"
                     f"📲 Agrega al calendario aquí:\n{link}"
                 )
 

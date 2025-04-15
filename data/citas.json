@@ -1,0 +1,404 @@
+{
+    "citas": [
+      {
+        "id": 1,
+        "fecha": "2025-04-16",
+        "hora": "09:00:00",
+        "disponible": 1,
+        "medico": "Dra. Camila Herrera",
+        "especialidad": "Pediatría"
+      },
+      {
+        "id": 2,
+        "fecha": "2025-04-16",
+        "hora": "09:30:00",
+        "disponible": 1,
+        "medico": "Dra. Camila Herrera",
+        "especialidad": "Pediatría"
+      },
+      {
+        "id": 3,
+        "fecha": "2025-04-16",
+        "hora": "10:00:00",
+        "disponible": 1,
+        "medico": "Dra. Camila Herrera",
+        "especialidad": "Pediatría"
+      },
+      {
+        "id": 4,
+        "fecha": "2025-04-16",
+        "hora": "10:30:00",
+        "disponible": 1,
+        "medico": "Dra. Camila Herrera",
+        "especialidad": "Pediatría"
+      },
+      {
+        "id": 5,
+        "fecha": "2025-04-16",
+        "hora": "11:00:00",
+        "disponible": 1,
+        "medico": "Dra. Camila Herrera",
+        "especialidad": "Pediatría"
+      },
+      {
+        "id": 6,
+        "fecha": "2025-04-16",
+        "hora": "11:30:00",
+        "disponible": 1,
+        "medico": "Dra. Camila Herrera",
+        "especialidad": "Pediatría"
+      },
+      {
+        "id": 7,
+        "fecha": "2025-04-16",
+        "hora": "12:00:00",
+        "disponible": 1,
+        "medico": "Dra. Camila Herrera",
+        "especialidad": "Pediatría"
+      },
+      {
+        "id": 8,
+        "fecha": "2025-04-16",
+        "hora": "12:30:00",
+        "disponible": 1,
+        "medico": "Dra. Camila Herrera",
+        "especialidad": "Pediatría"
+      },
+      {
+        "id": 9,
+        "fecha": "2025-04-16",
+        "hora": "13:00:00",
+        "disponible": 1,
+        "medico": "Dra. Camila Herrera",
+        "especialidad": "Pediatría"
+      },
+      {
+        "id": 10,
+        "fecha": "2025-04-16",
+        "hora": "13:30:00",
+        "disponible": 1,
+        "medico": "Dra. Camila Herrera",
+        "especialidad": "Pediatría"
+      },
+      {
+        "id": 11,
+        "fecha": "2025-04-16",
+        "hora": "14:00:00",
+        "disponible": 1,
+        "medico": "Dra. Camila Herrera",
+        "especialidad": "Pediatría"
+      },
+      {
+        "id": 12,
+        "fecha": "2025-04-16",
+        "hora": "14:30:00",
+        "disponible": 1,
+        "medico": "Dra. Camila Herrera",
+        "especialidad": "Pediatría"
+      },
+      {
+        "id": 13,
+        "fecha": "2025-04-16",
+        "hora": "15:00:00",
+        "disponible": 1,
+        "medico": "Dra. Camila Herrera",
+        "especialidad": "Pediatría"
+      },
+      {
+        "id": 14,
+        "fecha": "2025-04-16",
+        "hora": "15:30:00",
+        "disponible": 1,
+        "medico": "Dra. Camila Herrera",
+        "especialidad": "Pediatría"
+      },
+      {
+        "id": 15,
+        "fecha": "2025-04-16",
+        "hora": "16:00:00",
+        "disponible": 1,
+        "medico": "Dra. Camila Herrera",
+        "especialidad": "Pediatría"
+      },
+      {
+        "id": 16,
+        "fecha": "2025-04-16",
+        "hora": "09:00:00",
+        "disponible": 1,
+        "medico": "Dr. Matías Riquelme",
+        "especialidad": "Traumatología"
+      },
+      {
+        "id": 17,
+        "fecha": "2025-04-16",
+        "hora": "09:30:00",
+        "disponible": 1,
+        "medico": "Dr. Matías Riquelme",
+        "especialidad": "Traumatología"
+      },
+      {
+        "id": 18,
+        "fecha": "2025-04-16",
+        "hora": "10:00:00",
+        "disponible": 1,
+        "medico": "Dr. Matías Riquelme",
+        "especialidad": "Traumatología"
+      },
+      {
+        "id": 19,
+        "fecha": "2025-04-16",
+        "hora": "10:30:00",
+        "disponible": 1,
+        "medico": "Dr. Matías Riquelme",
+        "especialidad": "Traumatología"
+      },
+      {
+        "id": 20,
+        "fecha": "2025-04-16",
+        "hora": "11:00:00",
+        "disponible": 1,
+        "medico": "Dr. Matías Riquelme",
+        "especialidad": "Traumatología"
+      },
+      {
+        "id": 21,
+        "fecha": "2025-04-16",
+        "hora": "11:30:00",
+        "disponible": 1,
+        "medico": "Dr. Matías Riquelme",
+        "especialidad": "Traumatología"
+      },
+      {
+        "id": 22,
+        "fecha": "2025-04-16",
+        "hora": "12:00:00",
+        "disponible": 1,
+        "medico": "Dr. Matías Riquelme",
+        "especialidad": "Traumatología"
+      },
+      {
+        "id": 23,
+        "fecha": "2025-04-16",
+        "hora": "12:30:00",
+        "disponible": 1,
+        "medico": "Dr. Matías Riquelme",
+        "especialidad": "Traumatología"
+      },
+      {
+        "id": 24,
+        "fecha": "2025-04-16",
+        "hora": "13:00:00",
+        "disponible": 1,
+        "medico": "Dr. Matías Riquelme",
+        "especialidad": "Traumatología"
+      },
+      {
+        "id": 25,
+        "fecha": "2025-04-16",
+        "hora": "13:30:00",
+        "disponible": 1,
+        "medico": "Dr. Matías Riquelme",
+        "especialidad": "Traumatología"
+      },
+      {
+        "id": 26,
+        "fecha": "2025-04-16",
+        "hora": "14:00:00",
+        "disponible": 1,
+        "medico": "Dr. Matías Riquelme",
+        "especialidad": "Traumatología"
+      },
+      {
+        "id": 27,
+        "fecha": "2025-04-16",
+        "hora": "14:30:00",
+        "disponible": 1,
+        "medico": "Dr. Matías Riquelme",
+        "especialidad": "Traumatología"
+      },
+      {
+        "id": 28,
+        "fecha": "2025-04-16",
+        "hora": "15:00:00",
+        "disponible": 1,
+        "medico": "Dr. Matías Riquelme",
+        "especialidad": "Traumatología"
+      },
+      {
+        "id": 29,
+        "fecha": "2025-04-16",
+        "hora": "15:30:00",
+        "disponible": 1,
+        "medico": "Dr. Matías Riquelme",
+        "especialidad": "Traumatología"
+      },
+      {
+        "id": 30,
+        "fecha": "2025-04-16",
+        "hora": "16:00:00",
+        "disponible": 1,
+        "medico": "Dr. Matías Riquelme",
+        "especialidad": "Traumatología"
+      },
+      {
+        "id": 31,
+        "fecha": "2025-04-16",
+        "hora": "09:00:00",
+        "disponible": 1,
+        "medico": "Dra. Fernanda Soto",
+        "especialidad": "Ginecología"
+      },
+      {
+        "id": 32,
+        "fecha": "2025-04-16",
+        "hora": "09:30:00",
+        "disponible": 1,
+        "medico": "Dra. Fernanda Soto",
+        "especialidad": "Ginecología"
+      },
+      {
+        "id": 33,
+        "fecha": "2025-04-16",
+        "hora": "10:00:00",
+        "disponible": 1,
+        "medico": "Dra. Fernanda Soto",
+        "especialidad": "Ginecología"
+      },
+      {
+        "id": 34,
+        "fecha": "2025-04-16",
+        "hora": "10:30:00",
+        "disponible": 1,
+        "medico": "Dra. Fernanda Soto",
+        "especialidad": "Ginecología"
+      },
+      {
+        "id": 35,
+        "fecha": "2025-04-16",
+        "hora": "11:00:00",
+        "disponible": 1,
+        "medico": "Dra. Fernanda Soto",
+        "especialidad": "Ginecología"
+      },
+      {
+        "id": 36,
+        "fecha": "2025-04-16",
+        "hora": "11:30:00",
+        "disponible": 1,
+        "medico": "Dra. Fernanda Soto",
+        "especialidad": "Ginecología"
+      },
+      {
+        "id": 37,
+        "fecha": "2025-04-16",
+        "hora": "12:00:00",
+        "disponible": 1,
+        "medico": "Dra. Fernanda Soto",
+        "especialidad": "Ginecología"
+      },
+      {
+        "id": 38,
+        "fecha": "2025-04-16",
+        "hora": "12:30:00",
+        "disponible": 1,
+        "medico": "Dra. Fernanda Soto",
+        "especialidad": "Ginecología"
+      },
+      {
+        "id": 39,
+        "fecha": "2025-04-16",
+        "hora": "13:00:00",
+        "disponible": 1,
+        "medico": "Dra. Fernanda Soto",
+        "especialidad": "Ginecología"
+      },
+      {
+        "id": 40,
+        "fecha": "2025-04-16",
+        "hora": "13:30:00",
+        "disponible": 1,
+        "medico": "Dra. Fernanda Soto",
+        "especialidad": "Ginecología"
+      },
+      {
+        "id": 41,
+        "fecha": "2025-04-16",
+        "hora": "14:00:00",
+        "disponible": 1,
+        "medico": "Dra. Fernanda Soto",
+        "especialidad": "Ginecología"
+      },
+      {
+        "id": 42,
+        "fecha": "2025-04-16",
+        "hora": "14:30:00",
+        "disponible": 1,
+        "medico": "Dra. Fernanda Soto",
+        "especialidad": "Ginecología"
+      },
+      {
+        "id": 43,
+        "fecha": "2025-04-16",
+        "hora": "15:00:00",
+        "disponible": 1,
+        "medico": "Dra. Fernanda Soto",
+        "especialidad": "Ginecología"
+      },
+      {
+        "id": 44,
+        "fecha": "2025-04-16",
+        "hora": "15:30:00",
+        "disponible": 1,
+        "medico": "Dra. Fernanda Soto",
+        "especialidad": "Ginecología"
+      },
+      {
+        "id": 45,
+        "fecha": "2025-04-16",
+        "hora": "16:00:00",
+        "disponible": 1,
+        "medico": "Dra. Fernanda Soto",
+        "especialidad": "Ginecología"
+      },
+      {
+        "id": 46,
+        "fecha": "2025-04-16",
+        "hora": "09:00:00",
+        "disponible": 1,
+        "medico": "Dr. Tomás Valenzuela",
+        "especialidad": "Cardiología"
+      },
+      {
+        "id": 47,
+        "fecha": "2025-04-16",
+        "hora": "09:30:00",
+        "disponible": 1,
+        "medico": "Dr. Tomás Valenzuela",
+        "especialidad": "Cardiología"
+      },
+      {
+        "id": 48,
+        "fecha": "2025-04-16",
+        "hora": "10:00:00",
+        "disponible": 1,
+        "medico": "Dr. Tomás Valenzuela",
+        "especialidad": "Cardiología"
+      },
+      {
+        "id": 49,
+        "fecha": "2025-04-16",
+        "hora": "10:30:00",
+        "disponible": 1,
+        "medico": "Dr. Tomás Valenzuela",
+        "especialidad": "Cardiología"
+      },
+      {
+        "id": 50,
+        "fecha": "2025-04-16",
+        "hora": "11:00:00",
+        "disponible": 1,
+        "medico": "Dr. Tomás Valenzuela",
+        "especialidad": "Cardiología"
+      }
+    ]
+  }
