@@ -3,10 +3,14 @@ from datetime import datetime, timedelta
 import pyodbc
 import pytz
 import urllib.parse
+
 from twilio.twiml.messaging_response import MessagingResponse
-
-
 app = Flask(__name__)
+
+@app.route("/")
+def inicio():
+    return "¡Hola desde Flask en Render!"
+
 
 @app.route("/")
 def home():
@@ -137,3 +141,18 @@ def whatsapp_reply():
 if __name__ == "__main__":
     app.run(port=5000)
 
+<<<<<<< HEAD
+=======
+    slots = get_available_slots()
+
+    if slots:
+        print(f"📨 Enviando opciones a {your_phone}...")
+        send_whatsapp_options(your_phone, slots)
+
+        # 🔁 Simulamos que el usuario eligió la primera opción (índice 0)
+        seleccion = 0
+        print("🗓️ Enviando enlace de calendario para la opción seleccionada...")
+        send_calendar_link(your_phone, slots[seleccion])
+    else:
+        print("⛔ No hay horas disponibles para hoy.")
+>>>>>>> 3871018d5d41adba71487ee4724dc0b09de22606
