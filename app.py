@@ -70,7 +70,7 @@ def generar_google_calendar_link(fecha, hora, medico, especialidad):
 
 def buscar_respuesta_faq(usuario_input, from_number):
     try:
-        with open(DATA_DIR / 'faqs_mejorado.json', 'r', encoding='utf-8') as f:
+        with open(DATA_DIR / 'faqs.json', 'r', encoding='utf-8') as f:
             faqs_data = json.load(f)
         
         input_limpio = usuario_input.lower().strip()
