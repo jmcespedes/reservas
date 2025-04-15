@@ -12,9 +12,6 @@ app = Flask(__name__)
 def home():
     return "Servidor Flask funcionando correctamente 🎉"
 
-# Solo para pruebas locales
-if __name__ == '__main__':
-    app.run(debug=True)
 
 # Estado de usuarios temporal (se recomienda Redis o DB real para producción)
 user_state = {}
@@ -59,6 +56,7 @@ def get_available_slots():
         print("Error DB:", e)
         return []
 
+
 # Generar link calendario
 def generar_google_calendar_link(fecha, hora, medico, especialidad):
     tz = pytz.timezone('America/Santiago')
@@ -77,6 +75,7 @@ def generar_google_calendar_link(fecha, hora, medico, especialidad):
     }
 
     return 'https://www.google.com/calendar/render?' + urllib.parse.urlencode(params)
+
 
 # Webhook de WhatsApp
 @app.route("/whatsapp", methods=['POST'])
@@ -130,25 +129,8 @@ def whatsapp_reply():
     # 🔵 Etapa 3: Confirmado
     elif estado == "confirmado":
         msg.body("🎉 Ya has agendado tu cita. Si deseas otra, escribe *'agendar'*.")
-
+    
     return str(response)
 
-# Para correr local: flask run --port 5000
 if __name__ == "__main__":
-    app.run(port=5000)
-
-<<<<<<< HEAD
-=======
-    slots = get_available_slots()
-
-    if slots:
-        print(f"📨 Enviando opciones a {your_phone}...")
-        send_whatsapp_options(your_phone, slots)
-
-        # 🔁 Simulamos que el usuario eligió la primera opción (índice 0)
-        seleccion = 0
-        print("🗓️ Enviando enlace de calendario para la opción seleccionada...")
-        send_calendar_link(your_phone, slots[seleccion])
-    else:
-        print("⛔ No hay horas disponibles para hoy.")
->>>>>>> 3871018d5d41adba71487ee4724dc0b09de22606
+    app.run(debug=True, port=5000)
