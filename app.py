@@ -9,23 +9,18 @@ from twilio.twiml.messaging_response import MessagingResponse
 
 app = Flask(__name__)
 
-# Configuración de rutas
 DATA_DIR = Path(__file__).parent / 'data'
 
-# Ruta para health checks de Render
 @app.route("/")
 def health_check():
     return "Servidor operativo", 200
 
-# Ruta principal
 @app.route("/home")
 def home():
     return "Servidor Flask funcionando correctamente 🎉"
 
-# Estado de conversación con usuarios
 user_state = {}
 
-# Configuración de Twilio (usa variables de entorno en producción)
 account_sid = 'ACca96871739ae16b72c725adec77012c8'
 auth_token = 'd588793b92fd6e40c94691a9a37ec2a5'
 twilio_whatsapp_number = 'whatsapp:+14155238886'
@@ -37,28 +32,25 @@ def get_available_slots():
 
         with open(DATA_DIR / 'citas.json', 'r', encoding='utf-8') as f:
             data = json.load(f)
-            
+
         citas_hoy = [
             c for c in data['citas'] 
             if c['fecha'] == today and c['disponible'] == 1
         ]
-        
         citas_hoy.sort(key=lambda x: x['hora'])
+
         return [
             (c['fecha'], datetime.strptime(c['hora'], '%H:%M:%S').time(), c['medico'], c['especialidad'])
-            for c in citas_hoy[:3]  # Limita a 3 citas
+            for c in citas_hoy[:3]
         ]
-        
+
     except Exception as e:
         print("Error leyendo citas:", e)
         return []
 
 def generar_google_calendar_link(fecha, hora, medico, especialidad):
     tz = pytz.timezone('America/Santiago')
-    dt_inicio = tz.localize(datetime.combine(
-        datetime.strptime(fecha, '%Y-%m-%d').date(),
-        hora
-    ))
+    dt_inicio = tz.localize(datetime.combine(datetime.strptime(fecha, '%Y-%m-%d').date(), hora))
     dt_fin = dt_inicio + timedelta(minutes=30)
 
     start_str = dt_inicio.strftime('%Y%m%dT%H%M%S')
@@ -74,41 +66,41 @@ def generar_google_calendar_link(fecha, hora, medico, especialidad):
 
     return 'https://www.google.com/calendar/render?' + urllib.parse.urlencode(params)
 
-def buscar_respuesta_faq(user_input):
+def buscar_respuesta_faq(user_input, from_number):
     try:
         with open(DATA_DIR / 'faqs.json', 'r', encoding='utf-8') as f:
             data = json.load(f)
-            
-        user_input = user_input.lower().strip()
-        
 
-        for faq in data['faqs']:
-            if user_input == faq['pregunta'].lower():
-                return faq['respuesta']
-        
+        user_input = user_input.lower().strip()
+        coincidencias = []
 
         for faq in data['faqs']:
             pregunta = faq['pregunta'].lower()
-            if (user_input in pregunta) or (pregunta in user_input):
-                return faq['respuesta']
-        
+            if user_input in pregunta or pregunta in user_input:
+                coincidencias.append(faq)
 
-        palabras_clave = {
-            'horario': 'horario de atención',
-            'agendar': 'cómo agendar',
-            'dirección': 'dirección del hospital'
-        }
-        
-        for palabra, tema in palabras_clave.items():
-            if palabra in user_input:
-                for faq in data['faqs']:
-                    if tema in faq['pregunta'].lower():
-                        return faq['respuesta']
-        
-        # Si no encuentra nada, sugerir preguntas
-        preguntas = [faq['pregunta'] for faq in data['faqs'][:3]]
-        return f"¿Quieres decir algo como?\n- " + "\n- ".join(preguntas)
-        
+        if len(coincidencias) == 1:
+            return coincidencias[0]['respuesta']
+        elif len(coincidencias) > 1:
+            opciones = "\n".join([f"{i+1}. {faq['pregunta']}" for i, faq in enumerate(coincidencias)])
+            user_state[from_number] = {"estado": "esperando_faq_opcion", "coincidencias": coincidencias}
+            return f"¿A qué te refieres exactamente? Por favor elige una opción:\n{opciones}"
+        else:
+            palabras_clave = {
+                'horario': 'horario de atención',
+                'agendar': 'cómo agendar',
+                'dirección': 'dirección del hospital'
+            }
+
+            for palabra, tema in palabras_clave.items():
+                if palabra in user_input:
+                    for faq in data['faqs']:
+                        if tema in faq['pregunta'].lower():
+                            return faq['respuesta']
+
+            preguntas = [faq['pregunta'] for faq in data['faqs'][:3]]
+            return f"No entendí bien tu pregunta. ¿Quieres decir algo como?\n- " + "\n- ".join(preguntas)
+
     except Exception as e:
         print("Error leyendo FAQs:", e)
         return "Disculpa, estoy teniendo problemas para acceder a las preguntas frecuentes."
@@ -135,14 +127,13 @@ def whatsapp_reply():
             else:
                 msg.body("⛔ No hay horas disponibles por ahora. Intenta más tarde.")
         else:
-            respuesta = buscar_respuesta_faq(user_msg)
+            respuesta = buscar_respuesta_faq(user_msg, from_number)
             msg.body(respuesta)
-    
+
     elif estado == "esperando_opcion":
         if user_msg.isdigit():
             seleccion = int(user_msg) - 1
             slots = user_state[from_number]["slots"]
-
             if 0 <= seleccion < len(slots):
                 slot = slots[seleccion]
                 link = generar_google_calendar_link(slot[0], slot[1], slot[2], slot[3])
@@ -156,7 +147,7 @@ def whatsapp_reply():
                 msg.body("❌ Opción no válida. Por favor escribe un número del 1 al 3.")
         else:
             msg.body("❌ Por favor responde solo con el número de la opción (1, 2 o 3).")
-    
+
     elif estado == "confirmado":
         if "agendar" in user_msg:
             slots = get_available_slots()
@@ -169,7 +160,19 @@ def whatsapp_reply():
                 msg.body(texto)
         else:
             msg.body("🎉 Ya has agendado tu cita. Si deseas otra, escribe *'agendar'* o haz una nueva pregunta.")
-    
+
+    elif estado == "esperando_faq_opcion":
+        if user_msg.isdigit():
+            seleccion = int(user_msg) - 1
+            coincidencias = user_state[from_number].get("coincidencias", [])
+            if 0 <= seleccion < len(coincidencias):
+                msg.body(coincidencias[seleccion]['respuesta'])
+                user_state[from_number]["estado"] = "inicio"
+            else:
+                msg.body("❌ Opción no válida. Por favor escribe un número válido.")
+        else:
+            msg.body("❌ Por favor responde solo con el número de la opción que deseas.")
+
     return str(response)
 
 if __name__ == "__main__":

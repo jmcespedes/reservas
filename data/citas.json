@@ -34,24 +34,24 @@
       },
       {
         "id": 5,
-        "fecha": "2025-04-16",
-        "hora": "11:00:00",
+        "fecha": "2025-04-15",
+        "hora": "19:00:00",
         "disponible": 1,
         "medico": "Dra. Camila Herrera",
         "especialidad": "Pediatría"
       },
       {
         "id": 6,
-        "fecha": "2025-04-16",
-        "hora": "11:30:00",
+        "fecha": "2025-04-15",
+        "hora": "20:30:00",
         "disponible": 1,
         "medico": "Dra. Camila Herrera",
         "especialidad": "Pediatría"
       },
       {
         "id": 7,
-        "fecha": "2025-04-16",
-        "hora": "12:00:00",
+        "fecha": "2025-04-15",
+        "hora": "22:00:00",
         "disponible": 1,
         "medico": "Dra. Camila Herrera",
         "especialidad": "Pediatría"
