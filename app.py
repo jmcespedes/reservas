@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 import pytz
 import urllib.parse
 import json
-import difflib
 from pathlib import Path
 from twilio.twiml.messaging_response import MessagingResponse
 
@@ -64,11 +63,13 @@ def buscar_respuesta_faq(user_input, from_number):
             data = json.load(f)
 
         user_input = user_input.lower().strip()
+        print("Usuario preguntó:", user_input)  # Debug para Render
+
         coincidencias = []
 
         for faq in data['faqs']:
             score = fuzz.partial_ratio(user_input, faq['pregunta'].lower())
-            if score > 60:  # Puedes ajustar el umbral
+            if score > 50:  # Más permisivo
                 coincidencias.append((score, faq))
 
         coincidencias.sort(reverse=True, key=lambda x: x[0])
@@ -120,6 +121,23 @@ def whatsapp_reply():
             respuesta = buscar_respuesta_faq(user_msg, from_number)
             msg.body(respuesta)
 
+    elif estado == "esperando_opcion":
+        if user_msg.isdigit():
+            seleccion = int(user_msg) - 1
+            slots = user_state[from_number]["slots"]
+            if 0 <= seleccion < len(slots):
+                slot = slots[seleccion]
+                link = generar_google_calendar_link(slot[0], slot[1], slot[2], slot[3])
+                msg.body(
+                    f"✅ Cita con *{slot[2]}* agendada para el {slot[0]} a las {slot[1].strftime('%H:%M')}.\n\n"
+                    f"📲 Agrega al calendario aquí:\n{link}"
+                )
+                user_state[from_number] = {"estado": "confirmado"}
+            else:
+                msg.body("❌ Opción no válida. Por favor escribe un número del 1 al 3.")
+        else:
+            msg.body("❌ Por favor responde solo con el número de la opción (1, 2 o 3).")
+
     elif estado == "esperando_faq_opcion":
         if user_msg.isdigit():
             seleccion = int(user_msg) - 1
@@ -131,18 +149,6 @@ def whatsapp_reply():
                 msg.body("❌ Número inválido. Por favor responde con un número válido.")
         else:
             msg.body("❌ Por favor responde con el *número* correspondiente a una de las opciones.")
-
-    elif estado == "esperando_faq_opcion":
-        if user_msg.isdigit():
-            seleccion = int(user_msg) - 1
-            opciones = user_state[from_number].get("opciones_faq", [])
-            if 0 <= seleccion < len(opciones):
-                msg.body(opciones[seleccion]["respuesta"])
-                user_state[from_number] = {"estado": "inicio"}
-            else:
-                msg.body("❌ Número inválido. Por favor responde con un número válido.")
-        else:
-            msg.body("❌ Por favor responde con un número correspondiente a una opción.")
 
     elif estado == "confirmado":
         if "agendar" in user_msg:
