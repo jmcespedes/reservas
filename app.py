@@ -8,8 +8,8 @@ from pathlib import Path
 from twilio.twiml.messaging_response import MessagingResponse
 
 app = Flask(__name__)
-
 DATA_DIR = Path(__file__).parent / 'data'
+user_state = {}
 
 @app.route("/")
 def health_check():
@@ -19,12 +19,6 @@ def health_check():
 def home():
     return "Servidor Flask funcionando correctamente 🎉"
 
-user_state = {}
-
-account_sid = 'ACca96871739ae16b72c725adec77012c8'
-auth_token = 'd588793b92fd6e40c94691a9a37ec2a5'
-twilio_whatsapp_number = 'whatsapp:+14155238886'
-
 def get_available_slots():
     try:
         tz = pytz.timezone('America/Santiago')
@@ -33,17 +27,13 @@ def get_available_slots():
         with open(DATA_DIR / 'citas.json', 'r', encoding='utf-8') as f:
             data = json.load(f)
 
-        citas_hoy = [
-            c for c in data['citas'] 
-            if c['fecha'] == today and c['disponible'] == 1
-        ]
+        citas_hoy = [c for c in data['citas'] if c['fecha'] == today and c['disponible'] == 1]
         citas_hoy.sort(key=lambda x: x['hora'])
 
         return [
             (c['fecha'], datetime.strptime(c['hora'], '%H:%M:%S').time(), c['medico'], c['especialidad'])
             for c in citas_hoy[:3]
         ]
-
     except Exception as e:
         print("Error leyendo citas:", e)
         return []
@@ -74,6 +64,12 @@ def buscar_respuesta_faq(user_input, from_number):
         user_input = user_input.lower().strip()
         coincidencias = []
 
+        # Coincidencia exacta
+        for faq in data['faqs']:
+            if user_input == faq['pregunta'].lower():
+                return faq['respuesta']
+
+        # Coincidencias parciales
         for faq in data['faqs']:
             pregunta = faq['pregunta'].lower()
             if user_input in pregunta or pregunta in user_input:
@@ -82,24 +78,17 @@ def buscar_respuesta_faq(user_input, from_number):
         if len(coincidencias) == 1:
             return coincidencias[0]['respuesta']
         elif len(coincidencias) > 1:
-            opciones = "\n".join([f"{i+1}. {faq['pregunta']}" for i, faq in enumerate(coincidencias)])
-            user_state[from_number] = {"estado": "esperando_faq_opcion", "coincidencias": coincidencias}
-            return f"¿A qué te refieres exactamente? Por favor elige una opción:\n{opciones}"
-        else:
-            palabras_clave = {
-                'horario': 'horario de atención',
-                'agendar': 'cómo agendar',
-                'dirección': 'dirección del hospital'
+            user_state[from_number] = {
+                "estado": "esperando_faq_opcion",
+                "opciones_faq": coincidencias
             }
+            texto = "🤔 ¿Podrías aclarar a cuál te refieres?\n"
+            for i, faq in enumerate(coincidencias, 1):
+                texto += f"{i}. {faq['pregunta']}\n"
+            texto += "\nPor favor, responde con el número de la opción correcta."
+            return texto
 
-            for palabra, tema in palabras_clave.items():
-                if palabra in user_input:
-                    for faq in data['faqs']:
-                        if tema in faq['pregunta'].lower():
-                            return faq['respuesta']
-
-            preguntas = [faq['pregunta'] for faq in data['faqs'][:3]]
-            return f"No entendí bien tu pregunta. ¿Quieres decir algo como?\n- " + "\n- ".join(preguntas)
+        return "No encontré una respuesta exacta. ¿Podrías reformular tu pregunta?"
 
     except Exception as e:
         print("Error leyendo FAQs:", e)
@@ -137,7 +126,6 @@ def whatsapp_reply():
             if 0 <= seleccion < len(slots):
                 slot = slots[seleccion]
                 link = generar_google_calendar_link(slot[0], slot[1], slot[2], slot[3])
-
                 msg.body(
                     f"✅ Cita con *{slot[2]}* agendada para el {slot[0]} a las {slot[1].strftime('%H:%M')}.\n\n"
                     f"📲 Agrega al calendario aquí:\n{link}"
@@ -147,6 +135,18 @@ def whatsapp_reply():
                 msg.body("❌ Opción no válida. Por favor escribe un número del 1 al 3.")
         else:
             msg.body("❌ Por favor responde solo con el número de la opción (1, 2 o 3).")
+
+    elif estado == "esperando_faq_opcion":
+        if user_msg.isdigit():
+            seleccion = int(user_msg) - 1
+            opciones = user_state[from_number].get("opciones_faq", [])
+            if 0 <= seleccion < len(opciones):
+                msg.body(opciones[seleccion]["respuesta"])
+                user_state[from_number] = {"estado": "inicio"}
+            else:
+                msg.body("❌ Número inválido. Por favor responde con un número válido.")
+        else:
+            msg.body("❌ Por favor responde con un número correspondiente a una opción.")
 
     elif estado == "confirmado":
         if "agendar" in user_msg:
@@ -160,18 +160,6 @@ def whatsapp_reply():
                 msg.body(texto)
         else:
             msg.body("🎉 Ya has agendado tu cita. Si deseas otra, escribe *'agendar'* o haz una nueva pregunta.")
-
-    elif estado == "esperando_faq_opcion":
-        if user_msg.isdigit():
-            seleccion = int(user_msg) - 1
-            coincidencias = user_state[from_number].get("coincidencias", [])
-            if 0 <= seleccion < len(coincidencias):
-                msg.body(coincidencias[seleccion]['respuesta'])
-                user_state[from_number]["estado"] = "inicio"
-            else:
-                msg.body("❌ Opción no válida. Por favor escribe un número válido.")
-        else:
-            msg.body("❌ Por favor responde solo con el número de la opción que deseas.")
 
     return str(response)
 
