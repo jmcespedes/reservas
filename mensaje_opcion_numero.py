@@ -5,12 +5,8 @@ import pytz
 import urllib.parse
 
 from twilio.twiml.messaging_response import MessagingResponse
+
 app = Flask(__name__)
-
-@app.route("/")
-def inicio():
-    return "¡Hola desde Flask en Render!"
-
 
 @app.route("/")
 def home():
