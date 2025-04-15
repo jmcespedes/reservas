@@ -1,1 +1,1 @@
-web: gunicorn mensaje_opcion_numero:app
+web: gunicorn app:app
