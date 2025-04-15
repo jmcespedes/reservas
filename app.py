@@ -68,49 +68,57 @@ def generar_google_calendar_link(fecha, hora, medico, especialidad):
 
     return 'https://www.google.com/calendar/render?' + urllib.parse.urlencode(params)
 
-def buscar_respuesta_faq(user_input, from_number):
-    """Busca la mejor respuesta en las FAQs usando fuzzy matching"""
+def buscar_respuesta_faq(usuario_input, from_number):
     try:
-        with open(DATA_DIR / 'faqs.json', 'r', encoding='utf-8') as f:
-            data = json.load(f)
-
-        user_input = user_input.lower().strip()
-        logger.info(f"Buscando FAQ para: {user_input}")
-
+        with open(DATA_DIR / 'faqs_mejorado.json', 'r', encoding='utf-8') as f:
+            faqs_data = json.load(f)
+        
+        input_limpio = usuario_input.lower().strip()
         coincidencias = []
-        for faq in data['faqs']:
-            # Búsqueda mejorada: compara tanto con pregunta como con palabras clave
-            score_pregunta = fuzz.token_set_ratio(user_input, faq['pregunta'].lower())
-            score_keywords = fuzz.partial_ratio(user_input, faq.get('keywords', '').lower())
-            score = max(score_pregunta, score_keywords)
+        
+        for faq in faqs_data['faqs']:
+            # Búsqueda en pregunta y keywords
+            score_pregunta = fuzz.token_set_ratio(input_limpio, faq['pregunta'].lower())
+            score_keywords = max(
+                fuzz.partial_ratio(input_limpio, kw.lower()) 
+                for kw in faq['keywords'].split(', ')
+            )
+            score_max = max(score_pregunta, score_keywords)
             
-            if score > 65:  # Umbral más alto para mejores resultados
-                coincidencias.append((score, faq))
-
+            if score_max > 70:  # Umbral más alto para mayor precisión
+                coincidencias.append({
+                    "score": score_max,
+                    "faq": faq,
+                    "tipo": "pregunta" if score_pregunta > score_keywords else "keyword"
+                })
+        
         if not coincidencias:
-            return "🤔 No encontré información sobre eso. ¿Podrías reformular tu pregunta o escribir 'agendar' para reservar hora?"
-
-        coincidencias.sort(reverse=True, key=lambda x: x[0])
-        top_matches = [c[1] for c in coincidencias[:3]]  # Mostrar máximo 3 opciones
-
-        if len(top_matches) == 1:
-            return top_matches[0]['respuesta']
-        else:
-            user_state[from_number] = {
-                "estado": "esperando_faq_opcion",
-                "opciones_faq": top_matches,
-                "timestamp": datetime.now()
-            }
-            
-            texto = "📚 Encontré varias opciones:\n\n"
-            for i, faq in enumerate(top_matches, 1):
-                texto += f"{i}. {faq['pregunta']}\n"
-            texto += "\n🔢 Responde con el *número* de tu opción o 'menu' para volver."
-            return texto
+            return "❓ No encontré información sobre eso. Intenta con:\n- 'Agendar cita'\n- 'Horario atención'\n- 'Ubicación'"
+        
+        # Ordenar por score y priorizar matches exactos
+        coincidencias.sort(key=lambda x: (-x['score'], x['tipo'] == 'keyword'))
+        
+        # Si hay un claro ganador (diferencia > 15 puntos)
+        if len(coincidencias) > 1 and (coincidencias[0]['score'] - coincidencias[1]['score'] > 15):
+            return coincidencias[0]['faq']['respuesta']
+        
+        # Mostrar opciones si hay empate técnico
+        user_state[from_number] = {
+            "estado": "esperando_faq_opcion",
+            "opciones": [c['faq'] for c in coincidencias[:3]],
+            "timestamp": datetime.now()
+        }
+        
+        respuesta = "🔍 Encontré varias opciones:\n\n"
+        for i, opcion in enumerate(coincidencias[:3], 1):
+            respuesta += f"{i}. {opcion['faq']['pregunta']}\n"
+        respuesta += "\nResponde con el número de la opción que necesitas."
+        
+        return respuesta
 
     except Exception as e:
-        logger.error(f"Error en FAQs: {str(e)}")
-        return "⚠️ Disculpa, estoy teniendo problemas técnicos. Intenta nuevamente más tarde."
+        logger.error(f"Error buscando FAQ: {str(e)}")
+        return "⚠️ Ocurrió un error al buscar la información. Por favor intenta nuevamente."
 
 def actualizar_disponibilidad(fecha, hora, medico):
     """Marca una cita como no disponible"""

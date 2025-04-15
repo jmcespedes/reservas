@@ -1,324 +1,60 @@
 {
-    "faqs": [
-      {
-        "id": 1,
-        "pregunta": "¿Quiénes pueden atenderse?",
-        "respuesta": "👮 Este hospital atiende exclusivamente a funcionarios y beneficiarios de Carabineros de Chile, PDI, Gendarmería y DIPRECA."
-      },
-      {
-        "id": 2,
-        "pregunta": "¿Cuál es la dirección del hospital?",
-        "respuesta": "🏥 La dirección es Av. Vital Apoquindo 1200, Las Condes, Santiago."
-      },
-      {
-        "id": 3,
-        "pregunta": "¿Dónde está ubicado el hospital?",
-        "respuesta": "📍 Nos encuentras en Av. Vital Apoquindo 1200, Las Condes, Santiago."
-      },
-      {
-        "id": 4,
-        "pregunta": "¿Cómo llego al hospital con Waze?",
-        "respuesta": "🚗 Abre este enlace en Waze para llegar directamente: https://waze.com/ul?ll=-33.414805,-70.537303&navigate=yes"
-      },
-      {
-        "id": 5,
-        "pregunta": "¿Qué especialidades ofrece el hospital?",
-        "respuesta": "🩺 Las especialidades son: CIRUGÍA DE TÓRAX, CIRUGÍA VASCULAR, ENDOCRINOLOGÍA, GINECOLOGÍA, INFECTOLOGÍA, MEDICINA INTERNA, NEFROLOGÍA, NEUROLOGÍA, NUTRICIÓN, CIRUGÍA PLÁSTICA, COLOPROCTOLOGÍA, REUMATOLOGÍA, UROLOGÍA, PSICOLOGÍA, ACUPUNTURA, MEDICINA FAMILIAR, MATRONA, MORBILIDAD GENERAL, INMUNOLOGÍA."
-      },
-      {
-        "id": 6,
-        "pregunta": "¿Qué documentos necesito para atenderme?",
-        "respuesta": "🗂️ Debes presentar tu cédula de identidad y tu credencial de institución afiliada (DIPRECA, Carabineros, PDI o Gendarmería)."
-      },
-      {
-        "id": 7,
-        "pregunta": "¿Cuál es el horario de atención?",
-        "respuesta": "🕘 El horario de atención es de lunes a viernes, de 08:00 a 17:00 horas."
-      },
-      {
-        "id": 8,
-        "pregunta": "¿Atienden los fines de semana?",
-        "respuesta": "⛔ No, el hospital atiende solo de lunes a viernes, entre 08:00 y 17:00 horas."
-      },
-      {
-        "id": 9,
-        "pregunta": "¿El hospital es público o privado?",
-        "respuesta": "🏥 El Hospital DIPRECA es un centro de salud institucional que atiende exclusivamente a funcionarios y beneficiarios de Carabineros, PDI, Gendarmería y DIPRECA."
-      },
-      {
-        "id": 10,
-        "pregunta": "¿Cómo puedo pedir una hora médica?",
-        "respuesta": "📲 Puedes solicitar hora médica directamente a través del chatbot escribiendo \"agendar\" o llamando al número oficial del hospital."
-      },
-      {
-        "id": 11,
-        "pregunta": "¿Qué necesito para pedir una hora médica?",
-        "respuesta": "🗂️ Necesitas tu RUT y estar inscrito como beneficiario de DIPRECA, Carabineros, PDI o Gendarmería."
-      },
-      {
-        "id": 12,
-        "pregunta": "¿Atienden urgencias?",
-        "respuesta": "🚨 Sí, contamos con servicio de urgencia exclusivo para beneficiarios de las instituciones afiliadas."
-      },
-      {
-        "id": 13,
-        "pregunta": "¿Dónde me puedo hacer exámenes?",
-        "respuesta": "🧪 El hospital cuenta con laboratorio clínico y toma de muestras. Puedes agendar tu examen con orden médica."
-      },
-      {
-        "id": 14,
-        "pregunta": "¿Atienden niños o solo adultos?",
-        "respuesta": "👶👨‍🦳 Se atienden tanto adultos como niños, dependiendo de la especialidad y derivación médica."
-      },
-      {
-        "id": 15,
-        "pregunta": "¿El hospital cuenta con estacionamiento?",
-        "respuesta": "🅿️ Sí, el hospital dispone de estacionamiento para pacientes. Se recomienda llegar con tiempo, ya que los cupos son limitados."
-      },
-      {
-        "id": 16,
-        "pregunta": "¿Tienen atención dental?",
-        "respuesta": "🦷 Sí, el hospital cuenta con atención odontológica para beneficiarios en áreas como odontología general y especialidades."
-      },
-      {
-        "id": 17,
-        "pregunta": "¿Cuáles son los medios de contacto del hospital?",
-        "respuesta": "📞 Puedes comunicarte al teléfono institucional o visitar el sitio web oficial del Hospital DIPRECA para más información."
-      },
-      {
-        "id": 18,
-        "pregunta": "¿Se pueden hacer cirugías en el hospital?",
-        "respuesta": "🔪 Sí, contamos con pabellones quirúrgicos para realizar procedimientos en diversas especialidades médicas."
-      },
-      {
-        "id": 19,
-        "pregunta": "¿Dónde puedo dejar una felicitación o reclamo?",
-        "respuesta": "✉️ Puedes dejar tus comentarios directamente en la oficina OIRS del hospital o a través de la página web institucional."
-      },
-      {
-        "id": 20,
-        "pregunta": "¿El hospital tiene urgencias?",
-        "respuesta": "🚨 Sí, el hospital cuenta con servicio de urgencias exclusivo para beneficiarios de las instituciones afiliadas. Para más información, puedes llamar al Hospital DIPRECA al (2) 2951 7100."
-      },
-      {
-        "id": 21,
-        "pregunta": "¿Puedo pedir hora para más de un examen?",
-        "respuesta": "🩺 Sí, puedes pedir cita para múltiples exámenes o consultas con diferentes especialistas en una sola visita, si así lo requiere tu médico. Para orientación, comunícate al (2) 2951 7100."
-      },
-      {
-        "id": 22,
-        "pregunta": "¿Puedo agendar una consulta para alguien más?",
-        "respuesta": "👥 Sí, puedes agendar una consulta para otro beneficiario siempre que tengas sus datos personales y número de identificación institucional. Para más detalles, llama al (2) 2951 7100."
-      },
-      {
-        "id": 23,
-        "pregunta": "¿El hospital ofrece atención psicológica?",
-        "respuesta": "🧠 Sí, contamos con atención psicológica especializada tanto para adultos como para niños. Agenda tu cita llamando al (2) 2951 7100."
-      },
-      {
-        "id": 24,
-        "pregunta": "¿Cuáles son las formas de pago aceptadas?",
-        "respuesta": "💳 El hospital acepta pagos a través de transferencia bancaria, tarjeta de crédito y débito. Para más información, consulta directamente al (2) 2951 7100."
-      },
-      {
-        "id": 25,
-        "pregunta": "¿El hospital cuenta con atención de urgencias pediátricas?",
-        "respuesta": "👶 Sí, contamos con atención de urgencias pediátricas, exclusiva para beneficiarios de las instituciones mencionadas. Puedes confirmar disponibilidad al (2) 2951 7100."
-      },
-      {
-        "id": 26,
-        "pregunta": "¿Cómo me registro como nuevo beneficiario?",
-        "respuesta": "📝 Para registrarte como beneficiario, debes presentar tu cédula de identidad y el documento que te identifique como afiliado a DIPRECA, Carabineros, PDI o Gendarmería. Para dudas, llama al (2) 2951 7100."
-      },
-      {
-        "id": 27,
-        "pregunta": "¿El hospital tiene disponibilidad para consultas fuera de horario?",
-        "respuesta": "⏰ El horario regular es de lunes a viernes de 08:00 a 17:00 horas. Las consultas fuera de horario no están disponibles, excepto en urgencias. Para consultas, llama al (2) 2951 7100."
-      },
-      {
-        "id": 28,
-        "pregunta": "¿Dónde puedo pedir información sobre mi hora médica?",
-        "respuesta": "📞 Puedes obtener información sobre tu hora médica llamando al Hospital DIPRECA al (2) 2951 7100."
-      },
-      {
-        "id": 29,
-        "pregunta": "¿Qué hacer si no puedo asistir a mi cita?",
-        "respuesta": "❗ Si no puedes asistir a tu cita médica, por favor llama al (2) 2951 7100 para reprogramarla o liberarla para otro paciente."
-      },
-      {
-        "id": 30,
-        "pregunta": "¿El hospital ofrece servicios de maternidad?",
-        "respuesta": "👶 Sí, contamos con atención gineco-obstétrica, parto y post parto. Consulta disponibilidad llamando al (2) 2951 7100."
-      },
-      {
-        "id": 31,
-        "pregunta": "¿Cuál es el tiempo de espera promedio para una cita?",
-        "respuesta": "⏳ El tiempo de espera varía según la especialidad, usualmente entre 1 y 4 semanas. Puedes confirmar al (2) 2951 7100."
-      },
-      {
-        "id": 32,
-        "pregunta": "¿Se necesita receta para agendar una consulta?",
-        "respuesta": "📝 En algunas especialidades se requiere derivación o receta médica. Para más información, comunícate al (2) 2951 7100."
-      },
-      {
-        "id": 33,
-        "pregunta": "¿Puedo solicitar información sobre medicamentos?",
-        "respuesta": "💊 Si necesitas información sobre un medicamento, puedes llamar al hospital al (2) 2951 7100 y solicitar hablar con farmacia o tu médico tratante."
-      },
-      {
-        "id": 34,
-        "pregunta": "¿El hospital realiza consultas por telemedicina?",
-        "respuesta": "💻 Sí, realizamos consultas por telemedicina en algunas especialidades. Consulta disponibilidad llamando al (2) 2951 7100."
-      },
-      {
-        "id": 35,
-        "pregunta": "¿Cómo puedo comunicarme con un especialista?",
-        "respuesta": "📞 Para comunicarte con un especialista, debes agendar una hora médica llamando al (2) 2951 7100."
-      },
-      {
-        "id": 36,
-        "pregunta": "¿El hospital tiene servicio de farmacia?",
-        "respuesta": "💊 Sí, el hospital cuenta con una farmacia para la entrega de medicamentos. Consulta disponibilidad llamando al (2) 2951 7100."
-      },
-      {
-        "id": 37,
-        "pregunta": "¿Cómo puedo hacer una queja o sugerencia?",
-        "respuesta": "✉️ Puedes dejar tus comentarios en la oficina OIRS del hospital o llamar al (2) 2951 7100 para orientación."
-      },
-      {
-        "id": 38,
-        "pregunta": "¿El hospital tiene algún tipo de convenio con otras instituciones?",
-        "respuesta": "🤝 Sí, el hospital mantiene convenios con algunas instituciones públicas y privadas. Para saber más, puedes comunicarte al (2) 2951 7100."
-      },
-      {
-        "id": 39,
-        "pregunta": "¿Cuál es la dirección del Hospital DIPRECA?",
-        "respuesta": "📍 El Hospital DIPRECA se encuentra en Avenida Vital Apoquindo 1200, Las Condes, Región Metropolitana, Chile."
-      },
-      {
-        "id": 40,
-        "pregunta": "¿Cuál es el número de teléfono del Hospital DIPRECA?",
-        "respuesta": "📞 El número de teléfono principal del Hospital DIPRECA es (2) 2951 7100."
-      },
-      {
-        "id": 41,
-        "pregunta": "¿El Hospital DIPRECA ofrece servicios de urgencias?",
-        "respuesta": "🚑 Sí, el Hospital DIPRECA cuenta con un servicio de urgencias para sus beneficiarios. Para más información, llama al (2) 2951 7100."
-      },
-      {
-        "id": 42,
-        "pregunta": "¿Cómo puedo acceder a los resultados de mis exámenes?",
-        "respuesta": "📈 Puedes acceder a los resultados de tus exámenes en línea a través de la plataforma del hospital. Para asistencia, contacta al (2) 2951 7100."
-      },
-      {
-        "id": 43,
-        "pregunta": "¿El Hospital DIPRECA realiza procedimientos quirúrgicos?",
-        "respuesta": "🔪 Sí, el hospital ofrece una variedad de procedimientos quirúrgicos. Para detalles y agendar una consulta, llama al (2) 2951 7100."
-      },
-      {
-        "id": 44,
-        "pregunta": "¿El Hospital DIPRECA tiene convenio con universidades?",
-        "respuesta": "🎓 Sí, el hospital tiene convenios con diversas universidades para la formación de profesionales de la salud. Para más información, contacta al (2) 2951 7100."
-      },
-      {
-        "id": 45,
-        "pregunta": "¿Dónde puedo encontrar información sobre el hospital?",
-        "respuesta": "🌐 Puedes visitar el sitio web oficial del Hospital DIPRECA en www.hospitaldipreca.cl para obtener información detallada."
-      },
-      {
-        "id": 46,
-        "pregunta": "¿El Hospital DIPRECA ofrece servicios de telemedicina?",
-        "respuesta": "💻 Sí, el hospital ofrece consultas por telemedicina en algunas especialidades. Para más información, llama al (2) 2951 7100."
-      },
-      {
-        "id": 47,
-        "pregunta": "¿Cómo puedo hacer una sugerencia o reclamo?",
-        "respuesta": "📝 Puedes enviar tus sugerencias o reclamos a través de la Oficina de Información, Reclamos y Sugerencias (OIRS) del hospital. Para asistencia, contacta al (2) 2951 7100."
-      },
-      {
-        "id": 48,
-        "pregunta": "¿El Hospital DIPRECA realiza investigaciones clínicas?",
-        "respuesta": "🔬 Sí, el hospital participa en investigaciones clínicas en diversas áreas de la salud. Para más información, visita www.hospitaldipreca.cl o llama al (2) 2951 7100."
-      },
-      {
-        "id": 49,
-        "pregunta": "¿El Hospital DIPRECA tiene servicio de farmacia?",
-        "respuesta": "💊 Sí, el hospital cuenta con una farmacia para la entrega de medicamentos. Para más información, contacta al (2) 2951 7100."
-      },
-      {
-        "id": 50,
-        "pregunta": "¿El Hospital DIPRECA ofrece servicios de rehabilitación?",
-        "respuesta": "🧑‍⚕️ Sí, el hospital ofrece servicios de rehabilitación física y ocupacional. Para detalles, llama al (2) 2951 7100."
-      },
-      {
-        "id": 51,
-        "pregunta": "¿El Hospital DIPRECA tiene servicio de laboratorio?",
-        "respuesta": "🧪 Sí, el hospital cuenta con un laboratorio clínico para la realización de diversos exámenes. Para más información, contacta al (2) 2951 7100."
-      },
-      {
-        "id": 52,
-        "pregunta": "¿El Hospital DIPRECA ofrece servicios de diagnóstico por imágenes?",
-        "respuesta": "🖼️ Sí, el hospital ofrece servicios de diagnóstico por imágenes, incluyendo radiografías y ecografías. Para detalles, llama al (2) 2951 7100."
-      },
-      {
-        "id": 53,
-        "pregunta": "¿El Hospital DIPRECA tiene servicio de urgencias pediátricas?",
-        "respuesta": "👶 Sí, el hospital cuenta con atención de urgencias pediátricas. Para más información, contacta al (2) 2951 7100."
-      },
-      {
-        "id": 54,
-        "pregunta": "¿El Hospital DIPRECA realiza cirugías ambulatorias?",
-        "respuesta": "🏥 Sí, el hospital realiza cirugías ambulatorias en diversas especialidades. Para detalles y agendar una consulta, llama al (2) 2951 7100."
-      },
-      {
-        "id": 55,
-        "pregunta": "¿El Hospital DIPRECA ofrece servicios de salud mental?",
-        "respuesta": "🧠 Sí, el hospital ofrece servicios de salud mental, incluyendo consultas con psicólogos y psiquiatras. Para más información, contacta al (2) 2951 7100."
-      },
-      {
-        "id": 56,
-        "pregunta": "¿El Hospital DIPRECA tiene servicio de gineco-obstetricia?",
-        "respuesta": "👩‍⚕️ Sí, el hospital cuenta con un servicio de gineco-obstetricia para atención de mujeres. Para detalles, llama al (2) 2951 7100."
-      },
-      {
-        "id": 57,
-        "pregunta": "¿El Hospital DIPRECA ofrece servicios de nutrición?",
-        "respuesta": "🥗 Sí, el hospital ofrece servicios de nutrición, incluyendo consultas con nutricionistas. Para más información, contacta al (2) 2951 7100."
-      },
-      {
-        "id": 58,
-        "pregunta": "¿El Hospital DIPRECA tiene servicio de oftalmología?",
-        "respuesta": "👁️ Sí, el hospital cuenta con un servicio de oftalmología para atención de problemas visuales. Para detalles, llama al (2) 2951 7100."
-      },
-      {
-        "id": 59,
-        "pregunta": "¿El Hospital DIPRECA ofrece servicios de odontología?",
-        "respuesta": "🦷 Sí, el hospital ofrece servicios de odontología, incluyendo consultas y tratamientos dentales. Para más información, contacta al (2) 2951 7100."
-      },
-      {
-        "id": 60,
-        "pregunta": "¿El Hospital DIPRECA tiene servicio de otorrinolaringología?",
-        "respuesta": "👂 Sí, el hospital cuenta con un servicio de otorrinolaringología para atención de problemas de oído, nariz y garganta. Para detalles, llama al (2) 2951 7100."
-      },
-      {
-        "id": 61,
-        "pregunta": "¿El Hospital DIPRECA ofrece servicios de dermatología?",
-        "respuesta": "🧴 Sí, el hospital ofrece servicios de dermatología, incluyendo consultas para problemas de piel. Para más información, contacta al (2) 2951 7100."
-      },
-      {
-        "id": 62,
-        "pregunta": "¿El Hospital DIPRECA tiene servicio de cardiología?",
-        "respuesta": "❤️ Sí, el hospital cuenta con un servicio de cardiología para atención de enfermedades del corazón. Para detalles, llama al (2) 2951 7100."
-      },
-      {
-        "id": 63,
-        "pregunta": "¿El Hospital DIPRECA ofrece servicios de cirugía plástica?",
-        "respuesta": "💉 Sí, el hospital ofrece servicios de cirugía plástica, incluyendo procedimientos estéticos y reconstructivos. Para más información, contacta al (2) 2951 7100."
-      },
-      {
-        "id": 64,
-        "pregunta": "¿El Hospital DIPRECA tiene servicio de urología?",
-        "respuesta": "🚻 Sí, el hospital cuenta con un servicio de urología para atención de problemas del tracto urinario. Para detalles, llama al (2) 2951 7100."
-      }
-    ]
-  }
+  "faqs": [
+    {
+      "id": 1,
+      "pregunta": "¿Quiénes pueden atenderse en el hospital?",
+      "keywords": "beneficiarios, afiliados, funcionarios, atención, público, privado",
+      "respuesta": "👮 Este hospital atiende EXCLUSIVAMENTE a:\n\n• Funcionarios de Carabineros\n• Personal de la PDI\n• Gendarmería de Chile\n• Beneficiarios DIPRECA\n\nSi no perteneces a estas instituciones, te recomendamos acudir a otro centro de salud.",
+      "categoria": "general"
+    },
+    {
+      "id": 2,
+      "pregunta": "¿Dónde está ubicado el hospital y cómo llegar?",
+      "keywords": "dirección, ubicación, mapa, waze, google maps, transporte, cómo llegar",
+      "respuesta": "📍 *Ubicación Principal:*\n🏥 Av. Vital Apoquindo 1200, Las Condes, Santiago\n\n🚗 *Cómo llegar:*\n• Waze: https://waze.com/ul?ll=-33.414805,-70.537303\n• Google Maps: https://goo.gl/maps/ejemplo\n\n🚌 *Transporte Público:*\nMetro más cercano: Estación Escuela Militar (L1)",
+      "categoria": "ubicacion"
+    },
+    {
+      "id": 3,
+      "pregunta": "¿Qué especialidades médicas ofrecen?",
+      "keywords": "especialidades, doctores, médicos, servicios, atención",
+      "respuesta": "🩺 *Especialidades disponibles:*\n\n• Cirugía de Tórax\n• Cardiología\n• Ginecología\n• Pediatría\n• Traumatología\n• Psicología\n• Odontología\n• Y más...\n\nℹ Para disponibilidad actualizada, escribe 'especialidades' o llama al (2) 2951 7100.",
+      "categoria": "servicios"
+    },
+    {
+      "id": 4,
+      "pregunta": "¿Cuál es el horario de atención?",
+      "keywords": "horario, horas, atención, abierto, cerrrado, fines de semana",
+      "respuesta": "🕘 *Horario de atención:*\n\nLunes a Viernes:\n• 08:00 - 13:00 hrs (mañana)\n• 14:00 - 17:00 hrs (tarde)\n\n⛔ *Cerrado:*\n• Sábados, Domingos y Festivos\n\n🚨 Urgencias: 24/7 solo para beneficiarios",
+      "categoria": "horarios"
+    },
+    {
+      "id": 5,
+      "pregunta": "¿Cómo agendo una cita médica?",
+      "keywords": "agendar, reservar, hora, cita, consulta, pedir hora",
+      "respuesta": "📅 *Para agendar una cita:*\n\n1. Por este chat: Escribe 'AGENDAR' y sigue las instrucciones\n2. Por teléfono: Llama al (2) 2951 7100\n3. Presencial: En ventanillas del hospital\n\n📝 *Necesitarás:*\n• Tu RUT\n• Credencial de institución afiliada",
+      "categoria": "citas"
+    },
+    {
+      "id": 6,
+      "pregunta": "¿Qué documentos necesito para atenderme?",
+      "keywords": "documentos, requisitos, credencial, cédula, identificación",
+      "respuesta": "📋 *Documentos requeridos:*\n\n• Cédula de Identidad (física)\n• Credencial vigente de tu institución:\n  - Carabineros\n  - PDI\n  - Gendarmería\n  - DIPRECA\n\n⚠ Sin estos documentos NO podrás recibir atención.",
+      "categoria": "requisitos"
+    },
+    {
+      "id": 7,
+      "pregunta": "¿El hospital tiene servicio de urgencias?",
+      "keywords": "urgencia, emergencia, accidente, atención inmediata",
+      "respuesta": "🚨 *Servicio de Urgencias:*\n\n• Disponible 24/7\n• Solo para beneficiarios de instituciones afiliadas\n• Prioridad según gravedad\n\n📞 *Contacto Urgencias:* (2) 2951 7111\n\n📍 *Ubicación:* Acceso por Urgencias, costado norte del edificio principal",
+      "categoria": "servicios"
+    },
+    {
+      "id": 8,
+      "pregunta": "¿Cómo contacto al hospital?",
+      "keywords": "teléfono, contacto, email, correo, comunicación",
+      "respuesta": "📞 *Canales de contacto:*\n\n• Teléfono: (2) 2951 7100\n• WhatsApp: +56 9 1234 5678\n• Email: contacto@hospitaldipreca.cl\n• Web: www.hospitaldipreca.cl\n\n⏰ *Horario de contacto:* Lunes a Viernes de 8:00 a 17:00 hrs",
+      "categoria": "contacto"
+    }
+  ]
+}
