@@ -12,7 +12,6 @@ app = Flask(__name__)
 def home():
     return "Servidor Flask funcionando correctamente 🎉"
 
-
 # Estado de usuarios temporal (se recomienda Redis o DB real para producción)
 user_state = {}
 
@@ -30,7 +29,6 @@ db_config = {
     'pwd': 'cli_abas'
 }
 
-
 def get_available_slots():
     try:
         tz = pytz.timezone('America/Santiago')
@@ -47,7 +45,6 @@ def get_available_slots():
         WHERE CONVERT(DATE, fecha) = ? AND disponible = 1
         ORDER BY hora
         """
-
         cursor.execute(query, (today,))
         rows = cursor.fetchall()
 
@@ -59,8 +56,6 @@ def get_available_slots():
     except Exception as e:
         print("Error:", e)
         return []
-
-
 
 def generar_google_calendar_link(fecha, hora, medico, especialidad):
     tz = pytz.timezone('America/Santiago')
@@ -79,6 +74,31 @@ def generar_google_calendar_link(fecha, hora, medico, especialidad):
     }
 
     return 'https://www.google.com/calendar/render?' + urllib.parse.urlencode(params)
+
+def buscar_respuesta_faq(user_input):
+    try:
+        conn_str = f"DRIVER={db_config['driver']};SERVER={db_config['server']};DATABASE={db_config['database']};UID={db_config['uid']};PWD={db_config['pwd']}"
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
+
+        query = """
+        SELECT TOP 1 respuesta
+        FROM faq_hospital_dipreca
+        WHERE LOWER(pregunta) LIKE LOWER(?)
+        """
+        cursor.execute(query, (f"%{user_input}%",))
+        row = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        if row:
+            return row[0]
+        else:
+            return None
+    except Exception as e:
+        print("Error al buscar en FAQ:", e)
+        return None
 
 @app.route("/whatsapp", methods=['POST'])
 def whatsapp_reply():
@@ -102,9 +122,12 @@ def whatsapp_reply():
             else:
                 msg.body("⛔ No hay horas disponibles por ahora. Intenta más tarde.")
         else:
-            msg.body("👋 Hola, escribe *'Quiero agendar una hora'* para ver las citas disponibles.")
+            respuesta_faq = buscar_respuesta_faq(user_msg)
+            if respuesta_faq:
+                msg.body(respuesta_faq)
+            else:
+                msg.body("👋 Hola, escribe *'Quiero agendar una hora'* para ver las citas disponibles o haz una pregunta sobre el hospital.")
     
-
     elif estado == "esperando_opcion":
         if user_msg.isdigit():
             seleccion = int(user_msg) - 1
@@ -125,7 +148,6 @@ def whatsapp_reply():
         else:
             msg.body("❌ Por favor responde solo con el número de la opción (1, 2 o 3).")
     
-
     elif estado == "confirmado":
         msg.body("🎉 Ya has agendado tu cita. Si deseas otra, escribe *'agendar'*.")
     
