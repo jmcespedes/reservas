@@ -1,4 +1,5 @@
 import os
+from fuzzywuzzy import fuzz
 from flask import Flask, request
 from datetime import datetime, timedelta
 import pytz
@@ -63,25 +64,31 @@ def buscar_respuesta_faq(user_input, from_number):
             data = json.load(f)
 
         user_input = user_input.lower().strip()
-        preguntas = [faq['pregunta'].lower() for faq in data['faqs']]
-        similitudes = difflib.get_close_matches(user_input, preguntas, n=5, cutoff=0.4)
+        coincidencias = []
 
-        if not similitudes:
-            return "No encontré una respuesta exacta. ¿Podrías reformular tu pregunta?"
+        for faq in data['faqs']:
+            score = fuzz.partial_ratio(user_input, faq['pregunta'].lower())
+            if score > 60:  # Puedes ajustar el umbral
+                coincidencias.append((score, faq))
 
-        coincidencias = [faq for faq in data['faqs'] if faq['pregunta'].lower() in similitudes]
+        coincidencias.sort(reverse=True, key=lambda x: x[0])
+        top_matches = [c[1] for c in coincidencias[:5]]
 
-        if len(coincidencias) == 1:
-            return coincidencias[0]['respuesta']
+        if len(top_matches) == 0:
+            return "🤔 No encontré una coincidencia clara. ¿Podrías reformular tu pregunta?"
+
+        elif len(top_matches) == 1:
+            return top_matches[0]['respuesta']
+
         else:
             user_state[from_number] = {
                 "estado": "esperando_faq_opcion",
-                "opciones_faq": coincidencias
+                "opciones_faq": top_matches
             }
-            texto = "🤔 ¿Podrías aclarar a cuál te refieres?\n\n"
-            for i, faq in enumerate(coincidencias, 1):
+            texto = "🤔 ¿A qué te refieres exactamente?\n\n"
+            for i, faq in enumerate(top_matches, 1):
                 texto += f"{i}. {faq['pregunta']}\n"
-            texto += "\nResponde con el número de la opción correcta."
+            texto += "\nEscribe el *número* de la opción correcta."
             return texto
 
     except Exception as e:
@@ -113,22 +120,17 @@ def whatsapp_reply():
             respuesta = buscar_respuesta_faq(user_msg, from_number)
             msg.body(respuesta)
 
-    elif estado == "esperando_opcion":
+    elif estado == "esperando_faq_opcion":
         if user_msg.isdigit():
             seleccion = int(user_msg) - 1
-            slots = user_state[from_number]["slots"]
-            if 0 <= seleccion < len(slots):
-                slot = slots[seleccion]
-                link = generar_google_calendar_link(slot[0], slot[1], slot[2], slot[3])
-                msg.body(
-                    f"✅ Cita con *{slot[2]}* agendada para el {slot[0]} a las {slot[1].strftime('%H:%M')}.\n\n"
-                    f"📲 Agrega al calendario aquí:\n{link}"
-                )
-                user_state[from_number]["estado"] = "confirmado"
+            opciones = user_state[from_number].get("opciones_faq", [])
+            if 0 <= seleccion < len(opciones):
+                msg.body(opciones[seleccion]["respuesta"])
+                user_state[from_number] = {"estado": "inicio"}  # Reinicia estado
             else:
-                msg.body("❌ Opción no válida. Por favor escribe un número del 1 al 3.")
+                msg.body("❌ Número inválido. Por favor responde con un número válido.")
         else:
-            msg.body("❌ Por favor responde solo con el número de la opción (1, 2 o 3).")
+            msg.body("❌ Por favor responde con el *número* correspondiente a una de las opciones.")
 
     elif estado == "esperando_faq_opcion":
         if user_msg.isdigit():
