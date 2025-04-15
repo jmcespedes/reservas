@@ -24,18 +24,17 @@ twilio_whatsapp_number = 'whatsapp:+14155238886'
 # DB config
 db_config = {
     'driver': '{ODBC Driver 17 for SQL Server}',
-    'server': '168.88.162.66',
+    'server': '168.88.162.158',
     'database': 'DB_INFORMATICA',
     'uid': 'cli_abas',
     'pwd': 'cli_abas'
 }
 
-
+# Obtener horas disponibles
 def get_available_slots():
     try:
         tz = pytz.timezone('America/Santiago')
         today = datetime.now(tz).strftime('%Y-%m-%d')
-        print("Buscando horas para:", today)
 
         conn_str = f"DRIVER={db_config['driver']};SERVER={db_config['server']};DATABASE={db_config['database']};UID={db_config['uid']};PWD={db_config['pwd']}"
         conn = pyodbc.connect(conn_str)
@@ -50,18 +49,15 @@ def get_available_slots():
 
         cursor.execute(query, (today,))
         rows = cursor.fetchall()
-
-        print("🔍 Cantidad:", rows)
-
         cursor.close()
         conn.close()
         return rows
     except Exception as e:
-        print("Error:", e)
+        print("Error DB:", e)
         return []
 
 
-
+# Generar link calendario
 def generar_google_calendar_link(fecha, hora, medico, especialidad):
     tz = pytz.timezone('America/Santiago')
     dt_inicio = tz.localize(datetime.combine(fecha, hora))
@@ -75,11 +71,13 @@ def generar_google_calendar_link(fecha, hora, medico, especialidad):
         'text': f'Cita médica con {medico}',
         'dates': f'{start_str}/{end_str}',
         'details': f'Especialidad: {especialidad}',
-        'location': 'Hospital DIPRECA',
+        'location': 'Clínica Central',
     }
 
     return 'https://www.google.com/calendar/render?' + urllib.parse.urlencode(params)
 
+
+# Webhook de WhatsApp
 @app.route("/whatsapp", methods=['POST'])
 def whatsapp_reply():
     from_number = request.form.get('From')
@@ -89,6 +87,7 @@ def whatsapp_reply():
 
     estado = user_state.get(from_number, {}).get("estado", "inicio")
 
+    # 🟢 Etapa 1: Inicio
     if estado == "inicio":
         if "agendar" in user_msg:
             slots = get_available_slots()
@@ -97,6 +96,8 @@ def whatsapp_reply():
                 for i, row in enumerate(slots, 1):
                     texto += f"{i}. {row[1].strftime('%H:%M')} - {row[2]}\n"
                 texto += "\nEscribe el *número* de la opción que deseas reservar ✅"
+
+                # Guardamos el estado y las opciones
                 user_state[from_number] = {"estado": "esperando_opcion", "slots": slots}
                 msg.body(texto)
             else:
@@ -104,7 +105,7 @@ def whatsapp_reply():
         else:
             msg.body("👋 Hola, escribe *'Quiero agendar una hora'* para ver las citas disponibles.")
     
-
+    # 🟡 Etapa 2: Esperando número
     elif estado == "esperando_opcion":
         if user_msg.isdigit():
             seleccion = int(user_msg) - 1
@@ -125,7 +126,7 @@ def whatsapp_reply():
         else:
             msg.body("❌ Por favor responde solo con el número de la opción (1, 2 o 3).")
     
-
+    # 🔵 Etapa 3: Confirmado
     elif estado == "confirmado":
         msg.body("🎉 Ya has agendado tu cita. Si deseas otra, escribe *'agendar'*.")
     
