@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import pytz
 import urllib.parse
 import json
+import difflib
 from pathlib import Path
 from twilio.twiml.messaging_response import MessagingResponse
 
@@ -62,33 +63,26 @@ def buscar_respuesta_faq(user_input, from_number):
             data = json.load(f)
 
         user_input = user_input.lower().strip()
-        coincidencias = []
+        preguntas = [faq['pregunta'].lower() for faq in data['faqs']]
+        similitudes = difflib.get_close_matches(user_input, preguntas, n=5, cutoff=0.4)
 
-        # Coincidencia exacta
-        for faq in data['faqs']:
-            if user_input == faq['pregunta'].lower():
-                return faq['respuesta']
+        if not similitudes:
+            return "No encontré una respuesta exacta. ¿Podrías reformular tu pregunta?"
 
-        # Coincidencias parciales
-        for faq in data['faqs']:
-            pregunta = faq['pregunta'].lower()
-            if user_input in pregunta or pregunta in user_input:
-                coincidencias.append(faq)
+        coincidencias = [faq for faq in data['faqs'] if faq['pregunta'].lower() in similitudes]
 
         if len(coincidencias) == 1:
             return coincidencias[0]['respuesta']
-        elif len(coincidencias) > 1:
+        else:
             user_state[from_number] = {
                 "estado": "esperando_faq_opcion",
                 "opciones_faq": coincidencias
             }
-            texto = "🤔 ¿Podrías aclarar a cuál te refieres?\n"
+            texto = "🤔 ¿Podrías aclarar a cuál te refieres?\n\n"
             for i, faq in enumerate(coincidencias, 1):
                 texto += f"{i}. {faq['pregunta']}\n"
-            texto += "\nPor favor, responde con el número de la opción correcta."
+            texto += "\nResponde con el número de la opción correcta."
             return texto
-
-        return "No encontré una respuesta exacta. ¿Podrías reformular tu pregunta?"
 
     except Exception as e:
         print("Error leyendo FAQs:", e)
