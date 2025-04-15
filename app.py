@@ -16,7 +16,7 @@ def test_ping(ip):
         return "No se puede hacer ping al servidor."
 
 # Prueba la conexión con la IP
-result = test_ping("168.88.162.66")
+result = test_ping("168.88.162.158")
 print(result)
 
 
