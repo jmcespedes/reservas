@@ -1,3 +1,4 @@
+import os  # <-- Añade esta línea
 from flask import Flask, request
 from datetime import datetime, timedelta
 import pytz
@@ -8,6 +9,15 @@ from twilio.twiml.messaging_response import MessagingResponse
 
 
 app = Flask(__name__)
+
+
+@app.route("/")
+def health_check():
+    return "Servidor operativo", 200  # Responde con código 200 (OK)
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 10000))  # Usa el puerto de Render o 10000 por defecto
+    app.run(host='0.0.0.0', port=port)  # Escucha en todos los interfaces
 
 
 DATA_DIR = Path(__file__).parent / 'data'
