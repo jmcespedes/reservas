@@ -50,7 +50,7 @@ def get_available_slots():
         logger.error(f"Error leyendo citas: {str(e)}")
         return []
 
-def buscar_respuesta_faq(pregunta_usuario):
+def buscar_respuesta_faq(pregunta_usuario, from_number):
     """Busca en FAQs y devuelve la mejor respuesta o opciones si hay empate"""
     try:
         with open(DATA_DIR / 'faqs.json', 'r', encoding='utf-8') as f:
@@ -216,7 +216,7 @@ def whatsapp_reply():
             )
 
         # Buscar en FAQs si no es un comando de agendamiento
-        respuesta_faq = buscar_respuesta_faq(user_msg)
+        respuesta_faq = buscar_respuesta_faq(user_msg,from_number)
         if respuesta_faq:
             return build_twiml_response(respuesta_faq)
 
