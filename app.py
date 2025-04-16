@@ -1,21 +1,17 @@
-from flask import Flask, request, make_response
+from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
 import json
 from pathlib import Path
 import logging
 from fuzzywuzzy import fuzz
-import re
 
-
-# Configuración básica
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 DATA_DIR = Path(__file__).parent / 'data'
-user_state = {}
+user_state = {}  # Aquí guardamos el estado de cada número
 
-# Cargar FAQs al inicio (para mayor eficiencia)
 def cargar_faqs():
     try:
         with open(DATA_DIR / 'faqs.json', 'r', encoding='utf-8') as f:
@@ -26,24 +22,18 @@ def cargar_faqs():
 
 FAQS = cargar_faqs()
 
-# Buscar la mejor respuesta en FAQs
 def buscar_respuesta_faq(pregunta_usuario):
     pregunta_usuario = pregunta_usuario.lower().strip()
     mejor_respuesta = None
     mejor_puntaje = 0
 
     for faq in FAQS:
-        # Puntaje por pregunta exacta
         puntaje_pregunta = fuzz.ratio(pregunta_usuario, faq['pregunta'].lower())
-        
-        # Puntaje por keywords (usamos el máximo)
         keywords = [kw.strip().lower() for kw in faq.get('keywords', '').split(',')]
         puntaje_keywords = max([fuzz.ratio(pregunta_usuario, kw) for kw in keywords] + [0])
-        
-        # Puntaje total (priorizamos keywords)
-        puntaje_total = max(puntaje_keywords, puntaje_pregunta * 0.8)  # Keywords valen más
-        
-        if puntaje_total > 50 and puntaje_total > mejor_puntaje:  # Umbral bajo
+        puntaje_total = max(puntaje_keywords, puntaje_pregunta * 0.8)
+
+        if puntaje_total > 50 and puntaje_total > mejor_puntaje:
             mejor_puntaje = puntaje_total
             mejor_respuesta = faq['respuesta']
 
@@ -53,22 +43,46 @@ def buscar_respuesta_faq(pregunta_usuario):
 def whatsapp_reply():
     try:
         user_msg = request.form.get('Body', '').strip()
+        user_number = request.form.get('From')  # Número del usuario
         user_msg_lower = user_msg.lower()
 
-        # 1. Priorizar FAQs
+        # Estado actual del usuario
+        estado = user_state.get(user_number, {}).get('estado')
+
+        # 🌀 Manejo del flujo de agendamiento
+        if estado == 'pidiendo_nombre':
+            user_state[user_number]['nombre'] = user_msg
+            user_state[user_number]['estado'] = 'pidiendo_dia'
+            return build_twiml_response("📅 ¿Qué día deseas agendar la cita?")
+
+        elif estado == 'pidiendo_dia':
+            user_state[user_number]['dia'] = user_msg
+            user_state[user_number]['estado'] = 'pidiendo_hora'
+            return build_twiml_response("🕒 ¿A qué hora deseas tu cita?")
+
+        elif estado == 'pidiendo_hora':
+            user_state[user_number]['hora'] = user_msg
+            datos = user_state[user_number]
+            user_state.pop(user_number, None)  # Limpiar estado
+            return build_twiml_response(
+                f"✅ Cita agendada:\n"
+                f"👤 Nombre: {datos['nombre']}\n"
+                f"📅 Día: {datos['dia']}\n"
+                f"🕒 Hora: {datos['hora']}\n\n"
+                "¡Gracias por agendar con nosotros!"
+            )
+
+        # 🚀 Inicio del flujo de agendamiento
+        if "agendar" in user_msg_lower:
+            user_state[user_number] = {'estado': 'pidiendo_nombre'}
+            return build_twiml_response("👤 ¿Cuál es tu nombre para la cita?")
+
+        # 📚 Si no está en un flujo, intentamos responder con FAQ
         respuesta_faq = buscar_respuesta_faq(user_msg)
         if respuesta_faq:
             return build_twiml_response(respuesta_faq)
 
-        # 2. Opción secundaria: Agendamiento
-        if "agendar" in user_msg_lower:
-            return build_twiml_response(
-                "📅 Para agendar una cita, por favor contáctenos directamente al:\n"
-                "📞 +56 9 1234 5678\n"
-                "⏳ Horario de atención: Lunes a Viernes, 8:00 - 18:00"
-            )
-
-        # 3. Respuesta por defecto
+        # 🧭 Mensaje por defecto
         return build_twiml_response(
             "¡Hola! 👋 ¿En qué puedo ayudarte?\n\n"
             "Puedes preguntarme sobre:\n"
@@ -90,4 +104,3 @@ def build_twiml_response(message_text):
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
-
