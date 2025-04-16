@@ -51,28 +51,57 @@ def get_available_slots():
         return []
 
 def buscar_respuesta_faq(pregunta_usuario):
-    """Busca la respuesta en faqs.json usando coincidencias difusas"""
+    """Busca en FAQs y devuelve la mejor respuesta o opciones si hay empate"""
     try:
         with open(DATA_DIR / 'faqs.json', 'r', encoding='utf-8') as f:
             faqs = json.load(f)
         
         pregunta_usuario = pregunta_usuario.lower().strip()
-        mejor_coincidencia = None
-        mejor_puntaje = 0
+        coincidencias = []
 
         for faq in faqs['faqs']:
-            # Compara con la pregunta y keywords
-            puntaje_pregunta = fuzz.token_set_ratio(pregunta_usuario, faq['pregunta'].lower())
+            # Puntaje por coincidencia con la pregunta exacta
+            puntaje_pregunta = fuzz.ratio(pregunta_usuario, faq['pregunta'].lower())
+            
+            # Puntaje por keywords (usamos el máximo de los keywords)
+            keywords = [kw.strip().lower() for kw in faq.get('keywords', '').split(',')]
             puntaje_keywords = max(
-                [fuzz.partial_ratio(pregunta_usuario, kw.lower()) for kw in faq.get('keywords', '').split(', ')]
+                [fuzz.ratio(pregunta_usuario, kw) for kw in keywords] + [0]
             )
-            puntaje_max = max(puntaje_pregunta, puntaje_keywords)
+            
+            # Puntaje total (priorizamos keywords)
+            puntaje_total = max(puntaje_keywords, puntaje_pregunta * 0.7)  # Las keywords valen más
+            
+            if puntaje_total > 50:  # Umbral más bajo
+                coincidencias.append({
+                    "pregunta": faq['pregunta'],
+                    "respuesta": faq['respuesta'],
+                    "puntaje": puntaje_total
+                })
 
-            if puntaje_max > mejor_puntaje:
-                mejor_puntaje = puntaje_max
-                mejor_coincidencia = faq['respuesta']
+        if not coincidencias:
+            return None
 
-        return mejor_coincidencia if mejor_puntaje > 70 else None  # Umbral de coincidencia
+        # Ordenar por puntaje (de mayor a menor)
+        coincidencias.sort(key=lambda x: -x['puntaje'])
+
+        # Si hay un claro ganador (diferencia > 10 puntos), devolver esa respuesta
+        if len(coincidencias) > 1 and (coincidencias[0]['puntaje'] - coincidencias[1]['puntaje'] > 15):
+            return coincidencias[0]['respuesta']
+        
+        # Si hay empate, mostrar opciones
+        user_state[from_number] = {
+            "estado": "esperando_opcion_faq",
+            "opciones": [c['respuesta'] for c in coincidencias[:3]],  # Máximo 3 opciones
+            "timestamp": datetime.now()
+        }
+        
+        texto = "🔍 Encontré varias opciones:\n\n"
+        for i, opcion in enumerate(coincidencias[:3], 1):
+            texto += f"{i}. {opcion['pregunta']}\n"
+        texto += "\nResponde con el número de la opción que necesitas."
+        
+        return texto
 
     except Exception as e:
         logger.error(f"Error buscando FAQ: {str(e)}")
@@ -193,7 +222,7 @@ def whatsapp_reply():
 
         # Si no se encontró coincidencia en FAQs
         return build_twiml_response(
-            "¡Hola! 👋\n"
+            "¡Bienvenidos a Hospital Dipreca! 👋\n"
             "• Para agendar una cita, escribe *AGENDAR*.\n"
             "• Para preguntas frecuentes, escribe:\n"
             "  - 'Horarios de atención'\n"
