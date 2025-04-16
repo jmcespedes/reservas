@@ -3,6 +3,7 @@ from twilio.twiml.messaging_response import MessagingResponse
 import json
 from pathlib import Path
 import logging
+import os
 from fuzzywuzzy import fuzz
 
 logging.basicConfig(level=logging.INFO)
@@ -103,4 +104,7 @@ def build_twiml_response(message_text):
     return str(response), 200, {'Content-Type': 'text/xml'}
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000)
+
+
+
+app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
