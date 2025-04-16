@@ -7,6 +7,7 @@ from pathlib import Path
 from twilio.twiml.messaging_response import MessagingResponse
 import logging
 import re
+from fuzzywuzzy import fuzz
 
 # Configuración de logging
 logging.basicConfig(
@@ -48,6 +49,34 @@ def get_available_slots():
     except Exception as e:
         logger.error(f"Error leyendo citas: {str(e)}")
         return []
+
+def buscar_respuesta_faq(pregunta_usuario):
+    """Busca la respuesta en faqs.json usando coincidencias difusas"""
+    try:
+        with open(DATA_DIR / 'faqs.json', 'r', encoding='utf-8') as f:
+            faqs = json.load(f)
+        
+        pregunta_usuario = pregunta_usuario.lower().strip()
+        mejor_coincidencia = None
+        mejor_puntaje = 0
+
+        for faq in faqs['faqs']:
+            # Compara con la pregunta y keywords
+            puntaje_pregunta = fuzz.token_set_ratio(pregunta_usuario, faq['pregunta'].lower())
+            puntaje_keywords = max(
+                [fuzz.partial_ratio(pregunta_usuario, kw.lower()) for kw in faq.get('keywords', '').split(', ')]
+            )
+            puntaje_max = max(puntaje_pregunta, puntaje_keywords)
+
+            if puntaje_max > mejor_puntaje:
+                mejor_puntaje = puntaje_max
+                mejor_coincidencia = faq['respuesta']
+
+        return mejor_coincidencia if mejor_puntaje > 70 else None  # Umbral de coincidencia
+
+    except Exception as e:
+        logger.error(f"Error buscando FAQ: {str(e)}")
+        return None
 
 def generar_google_calendar_link(fecha, hora, medico, especialidad):
     """Genera link para agregar al calendario"""
@@ -99,19 +128,19 @@ def whatsapp_reply():
             logger.error("Datos incompletos recibidos")
             return build_twiml_response("Error: solicitud incompleta")
 
-        # Limpieza del mensaje: eliminar espacios y caracteres no numéricos
+        # Limpieza del mensaje
         user_msg_clean = re.sub(r'[^0-9]', '', user_msg)  # Solo números
         user_msg_lower = user_msg.lower()
 
-        # Comando global: AGENDAR o MENÚ
-        if "agendar" in user_msg_lower or "menú" in user_msg_lower:
+        # Comando global: AGENDAR
+        if "agendar" in user_msg_lower:
             slots = get_available_slots()
             if not slots:
                 return build_twiml_response(
                     "⏳ No hay citas disponibles hoy. Intenta mañana o escribe 'AGENDAR' más tarde."
                 )
             
-            # Mostrar opciones numeradas (1, 2, 3...)
+            # Mostrar opciones numeradas
             respuesta = "📅 *Citas disponibles hoy:*\n\n"
             for i, (fecha, hora, medico, especialidad) in enumerate(slots, 1):
                 respuesta += (
@@ -128,12 +157,12 @@ def whatsapp_reply():
             }
             return build_twiml_response(respuesta)
 
-        # Si el usuario ya está en modo selección de cita
+        # Si está en modo selección de cita
         elif from_number in user_state and user_state[from_number]["estado"] == "esperando_seleccion_cita":
             if not user_msg_clean.isdigit():
                 return build_twiml_response("❌ Por favor, responde *solo con el número* de la cita (ej: 1, 2, 3...).")
             
-            seleccion = int(user_msg_clean) - 1  # Convertir a índice
+            seleccion = int(user_msg_clean) - 1
             slots = user_state[from_number].get("slots", [])
             
             if seleccion < 0 or seleccion >= len(slots):
@@ -141,7 +170,6 @@ def whatsapp_reply():
             
             fecha, hora, medico, especialidad = slots[seleccion]
             
-            # Reservar la cita
             if not actualizar_disponibilidad(fecha, hora, medico):
                 return build_twiml_response("⚠️ Error al reservar. Intenta nuevamente.")
             
@@ -158,10 +186,19 @@ def whatsapp_reply():
                 "¡Gracias por tu reserva!"
             )
 
-        # Para cualquier otro mensaje
+        # Buscar en FAQs si no es un comando de agendamiento
+        respuesta_faq = buscar_respuesta_faq(user_msg)
+        if respuesta_faq:
+            return build_twiml_response(respuesta_faq)
+
+        # Si no se encontró coincidencia en FAQs
         return build_twiml_response(
-            "¡Hola! 👋 Para agendar una cita, escribe *AGENDAR*.\n"
-            "Si ya estás en proceso, responde con el número de la cita."
+            "¡Hola! 👋\n"
+            "• Para agendar una cita, escribe *AGENDAR*.\n"
+            "• Para preguntas frecuentes, escribe:\n"
+            "  - 'Horarios de atención'\n"
+            "  - 'Ubicación'\n"
+            "  - 'Requisitos'\n"
         )
 
     except Exception as e:
